@@ -1,5 +1,10 @@
-FROM eclipse-temurin:17
-COPY target/classes /app/classes
-COPY target/dependency /app/dependency
+FROM maven:3.8.6-eclipse-temurin-17 AS build
 WORKDIR /app
-CMD ["java", "-cp", "classes:dependency/*", "Main"]
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
+
+FROM eclipse-temurin:17
+WORKDIR /app
+COPY --from=build /app/target/*.jar bot.jar
+CMD ["java", "-jar", "bot.jar"]
