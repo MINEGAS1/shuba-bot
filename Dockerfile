@@ -2,9 +2,9 @@ FROM maven:3.8.6-eclipse-temurin-17 AS build
 WORKDIR /app
 COPY pom.xml .
 COPY src ./src
-RUN mvn clean package -DskipTests
+RUN mvn clean package assembly:single -DskipTests
 
 FROM eclipse-temurin:17
 WORKDIR /app
-COPY --from=build /app/target/shubabot2-1.0-SNAPSHOT.jar ./bot.jar
+COPY --from=build /app/target/*-jar-with-dependencies.jar ./bot.jar
 CMD ["java", "-jar", "bot.jar"]
